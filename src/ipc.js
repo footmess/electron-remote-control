@@ -18,7 +18,6 @@ module.exports = function() {
   ipcMain.on("control", async (e, remoteCode) => {
     // 先mock
     sendMainWindow("control-state-change", remoteCode, 1);
-    console.log("1");
     createControlWindow();
   });
 };

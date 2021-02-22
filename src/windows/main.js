@@ -9,7 +9,7 @@ const { createProtocol } = require("vue-cli-plugin-electron-builder/lib");
  * 公共创建窗口的函数
  **/
 let win;
-function create() {
+async function create() {
   // Create the browser window.
   win = new BrowserWindow({
     width: 800,
@@ -23,7 +23,7 @@ function create() {
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
-    win.loadURL(process.env.WEBPACK_DEV_SERVER_URL);
+    await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL);
     if (!process.env.IS_TEST) win.webContents.openDevTools();
   } else {
     createProtocol("app");

@@ -33,7 +33,6 @@ export default {
   },
   created() {
     this.login();
-    console.log({ obj: ipcRenderer });
   },
   methods: {
     async login() {
