@@ -6,8 +6,8 @@ const { BrowserWindow } = require("electron");
 const { createProtocol } = require("vue-cli-plugin-electron-builder/lib");
 
 /**
- * 公共创建窗口的函数
- **/
+* 公共创建窗口的函数
+**/
 let win;
 function create() {
   // Create the browser window.
@@ -23,7 +23,7 @@ function create() {
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
-    win.loadURL(process.env.WEBPACK_DEV_SERVER_URL);
+    win.loadURL(process.env.WEBPACK_DEV_SERVER_URL + 'control');
     if (!process.env.IS_TEST) win.webContents.openDevTools();
   } else {
     createProtocol("app");
@@ -33,9 +33,9 @@ function create() {
 }
 
 /**
- * 向渲染进程发送数据
- * 需要通过webContents来转发
- **/
+* 向渲染进程发送数据
+* 需要通过webContents来转发
+**/
 function send(channel, ...args) {
   win.webContents.send(channel, ...args);
 }
