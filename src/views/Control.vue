@@ -1,5 +1,28 @@
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
+  <div class="control-wrap">
+    <video id="screen-video" ref="screen-video"></video>
   </div>
 </template>
+
+<script>
+const peer = require("@/utils/peer-control");
+export default {
+  name: "Control",
+  created() {
+    peer.on('add-stream', stream => {
+      this.play(stream);
+    });
+  },
+  methods: {
+    play(stream) {
+      let video = this.$refs["screen-video"];
+      video.srcObject = stream;
+      video.onloadedmetadata = () => {
+        video.play();
+      };
+    }
+  }
+};
+</script>
+
+<style lang="scss" scoped></style>
