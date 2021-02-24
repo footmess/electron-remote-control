@@ -1,11 +1,9 @@
 const { ipcMain } = require("electron");
-const {
-  send: sendMainWindow,
-} = require("./windows/main");
-const {create:createControlWindow} = require('./windows/control');
+const { send: sendMainWindow } = require("./windows/main");
+const { create: createControlWindow } = require("./windows/control");
 /**
-* 统一处理ipc事件
-**/
+ * 统一处理ipc事件
+ **/
 module.exports = function() {
   // 处理渲染进程发来的login请求
   ipcMain.handle("login", async () => {

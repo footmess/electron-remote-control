@@ -6,8 +6,8 @@ const { BrowserWindow } = require("electron");
 const { createProtocol } = require("vue-cli-plugin-electron-builder/lib");
 
 /**
-* 公共创建窗口的函数
-**/
+ * 公共创建窗口的函数
+ **/
 let win;
 async function create() {
   // Create the browser window.
@@ -34,9 +34,9 @@ async function create() {
 }
 
 /**
-* 向渲染进程发送数据
-* 需要通过webContents来转发
-**/
+ * 向渲染进程发送数据
+ * 需要通过webContents来转发
+ **/
 function send(channel, ...args) {
   win.webContents.send(channel, ...args);
 }

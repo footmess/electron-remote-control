@@ -1,10 +1,10 @@
 <template>
-   <div v-if="controlText === ''">
-      <p>你的控制码：{{ localCode }}</p>
-      <input type="text" v-model="remoteCode" />
-      <button @click="handleClick(remoteCode)">确认</button>
-    </div>
-    <div v-else>{{ controlText }}</div>
+  <div v-if="controlText === ''">
+    <p>你的控制码：{{ localCode }}</p>
+    <input type="text" v-model="remoteCode" />
+    <button @click="handleClick(remoteCode)">确认</button>
+  </div>
+  <div v-else>{{ controlText }}</div>
 </template>
 
 <script>

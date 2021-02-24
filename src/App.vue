@@ -2,13 +2,13 @@
   <div id="app">
     <transition>
       <router-view />
-    </transition> 
+    </transition>
   </div>
 </template>
 
 <script>
 export default {
-  name: "App",
+  name: "App"
 };
 </script>
 
