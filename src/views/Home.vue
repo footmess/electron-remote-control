@@ -9,6 +9,7 @@
 
 <script>
 // @ is an alias to /src
+import "@/utils/peer-puppet";
 import { ipcRenderer } from "electron";
 
 export default {

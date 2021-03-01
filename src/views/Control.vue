@@ -15,6 +15,7 @@ export default {
   },
   created() {
     peer.on("add-stream", stream => {
+      console.log({ stream });
       this.play(stream);
     });
   },
