@@ -11,6 +11,8 @@ protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } }
 ]);
 
+app.allowRendererProcessReuse = false;
+
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
   // On macOS it is common for applications and their menu bar
@@ -40,6 +42,7 @@ app.on("ready", () => {
   // }
   createWindow();
   handleIPC();
+  require('./robot.js')();
 });
 
 // Exit cleanly on request from parent process in development mode.

@@ -1,7 +1,7 @@
 // node事件模块 监听和触发事件
 const EventEmitter = require("events");
 const peer = new EventEmitter();
-const { desktopCapturer } = require("electron");
+const { desktopCapturer, ipcRenderer } = require("electron");
 // 使用electron模拟控制端收到视频流的过程
 // https://www.electronjs.org/docs/api/desktop-capturer?q=getUserMedia
 async function getScreenStream() {
@@ -14,7 +14,7 @@ async function getScreenStream() {
       video: {
         mandatory: {
           chromeMediaSource: "desktop",
-          chromeMediaSourceId: sources[0].id,
+          chromeMediaSourceId: sources[1].id,
           maxWidth: window.screen.width,
           maxHeight: window.screen.height
         }
@@ -28,4 +28,19 @@ async function getScreenStream() {
     });
 }
 getScreenStream();
+peer.on('robot',(type,data) => {
+  if(type === 'mouse') {
+    data.screen = {
+      width: window.screen.width,
+      height: window.screen.height
+    }
+  }
+  // 通过ipcRenderer.send方法发送给主进程
+  // setTimeout(() => {
+    ipcRenderer.send('robot',type,data);
+  // },5000)
+})
+/**
+ * 事件中转站
+ */
 module.exports = peer;
