@@ -2,7 +2,7 @@
 // You can‘t mix import and module.exports.
 // import { BrowserWindow } from 'electron'
 // import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
-const { BrowserWindow } = require("electron");
+const { BrowserWindow, globalShortcut } = require("electron");
 const { createProtocol } = require("vue-cli-plugin-electron-builder/lib");
 
 /**
@@ -25,7 +25,13 @@ async function create() {
     // Load the url of the dev server if in development mode
     // http://localhost:8080/ 启动的web服务地址
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL);
-    if (!process.env.IS_TEST) win.webContents.openDevTools();
+    const ret = globalShortcut.register("Control+z", () => {
+      win.webContents.openDevTools();
+    });
+    if (!ret) {
+      console.log("registration failed");
+    }
+    // if (!process.env.IS_TEST) win.webContents.openDevTools();
   } else {
     createProtocol("app");
     // Load the index.html when not in development

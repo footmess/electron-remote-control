@@ -1,6 +1,6 @@
 "use strict";
 
-import { app, protocol, BrowserWindow } from "electron";
+import { app, protocol, BrowserWindow, globalShortcut } from "electron";
 // import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 const handleIPC = require("./ipc");
 const { create: createWindow } = require("./windows/main");
@@ -43,6 +43,11 @@ app.on("ready", () => {
   createWindow();
   handleIPC();
   require("./robot.js")();
+});
+
+app.on("will-quit", () => {
+  // 注销所有快捷键
+  globalShortcut.unregisterAll();
 });
 
 // Exit cleanly on request from parent process in development mode.
