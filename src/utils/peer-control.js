@@ -28,18 +28,18 @@ async function getScreenStream() {
     });
 }
 getScreenStream();
-peer.on('robot',(type,data) => {
-  if(type === 'mouse') {
+peer.on("robot", (type, data) => {
+  if (type === "mouse") {
     data.screen = {
       width: window.screen.width,
       height: window.screen.height
-    }
+    };
   }
   // 通过ipcRenderer.send方法发送给主进程
   // setTimeout(() => {
-    ipcRenderer.send('robot',type,data);
+  ipcRenderer.send("robot", type, data);
   // },5000)
-})
+});
 /**
  * 事件中转站
  */

@@ -42,7 +42,7 @@ app.on("ready", () => {
   // }
   createWindow();
   handleIPC();
-  require('./robot.js')();
+  require("./robot.js")();
 });
 
 // Exit cleanly on request from parent process in development mode.
