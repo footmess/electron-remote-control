@@ -32,6 +32,34 @@ async function getScreenStream() {
 }
 
 const pc = new window.RTCPeerConnection({});
+
+// docs: https://developer.mozilla.org/zh-CN/docs/Web/API/RTCPeerConnection/onicecandidate
+// WebRTC中可以通过onicecandidate这个事件去拿到对应的iceEvent 在RTCPeerConnection创建后会自动发起
+pc.onicecandidate = function(event) {
+  console.log("candidate", JSON.stringify(event.candidate));
+};
+
+// candidate缓冲池
+let candidates = [];
+// 添加candidate
+async function addIceCandidate(candidate) {
+  // 需要判断candidate的值，有可能是null
+  if (candidate) {
+    candidates.push(candidate);
+  }
+  // docs: https://developer.mozilla.org/zh-CN/docs/Web/API/RTCPeerConnection/addIceCandidate
+  // 需要判断RTCPeerConnection的remoteDescription是否已经设置 否则会报InvalidStateError
+  if (pc.remoteDescription && pc.remoteDescription.type) {
+    for (let i = 0; i < candidates.length; i++) {
+      await pc.addIceCandidate(new RTCIceCandidate(candidates[i]));
+    }
+    candidates = [];
+  }
+}
+
+// 把setRemote绑定到window上方便测试
+window.addIceCandidate = addIceCandidate;
+
 async function createAnswer(offer) {
   // 调用getScreenStream获取媒体流
   const mediaStream = await getScreenStream();

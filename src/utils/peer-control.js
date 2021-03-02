@@ -16,8 +16,36 @@ const peer = new EventEmitter();
 // });
 
 const pc = new window.RTCPeerConnection({});
+
+// docs: https://developer.mozilla.org/zh-CN/docs/Web/API/RTCPeerConnection/onicecandidate
+// WebRTC中可以通过onicecandidate这个事件去拿到对应的iceEvent
+pc.onicecandidate = function(event) {
+  console.log("candidate", JSON.stringify(event.candidate));
+};
+
+// candidate缓冲池
+let candidates = [];
+// 添加candidate
+async function addIceCandidate(candidate) {
+  // 需要判断candidate的值，有可能是null
+  if (candidate) {
+    candidates.push(candidate);
+  }
+  // docs: https://developer.mozilla.org/zh-CN/docs/Web/API/RTCPeerConnection/addIceCandidate
+  // 需要判断RTCPeerConnection的remoteDescription是否已经设置 否则会报InvalidStateError
+  if (pc.remoteDescription && pc.remoteDescription.type) {
+    for (let i = 0; i < candidates.length; i++) {
+      await pc.addIceCandidate(new RTCIceCandidate(candidates[i]));
+    }
+    candidates = [];
+  }
+}
+
+// 把setRemote绑定到window上方便测试
+window.addIceCandidate = addIceCandidate;
+
+// 调用createOffer方法创建一个offer 发起连接
 async function createOffer() {
-  // 调用createOffer方法创建一个offer
   // 这里offer就是一个SDP
   const offer = await pc.createOffer({
     // 只接受视频
