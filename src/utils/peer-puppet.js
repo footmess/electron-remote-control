@@ -1,7 +1,7 @@
 /**
  * 傀儡端逻辑
  */
-const { desktopCapturer } = require("electron");
+const { desktopCapturer, ipcRenderer } = require("electron");
 // 使用electron模拟控制端收到视频流的过程
 // https://www.electronjs.org/docs/api/desktop-capturer?q=getUserMedia
 async function getScreenStream() {
@@ -36,8 +36,16 @@ const pc = new window.RTCPeerConnection({});
 // docs: https://developer.mozilla.org/zh-CN/docs/Web/API/RTCPeerConnection/onicecandidate
 // WebRTC中可以通过onicecandidate这个事件去拿到对应的iceEvent 在RTCPeerConnection创建后会自动发起
 pc.onicecandidate = function(event) {
-  console.log("candidate", JSON.stringify(event.candidate));
+  if (event.candidate) {
+    // https://www.electronjs.org/docs/api/ipc-renderer#ipcrenderersendchannel-args
+    ipcRenderer.send("forward", "puppet-candidate", event.candidate.toJSON());
+  }
 };
+
+// 监听主进程传来的candidate channel
+ipcRenderer.on("candidate", (e, candidate) => {
+  addIceCandidate(candidate);
+});
 
 // candidate缓冲池
 let candidates = [];
@@ -57,9 +65,14 @@ async function addIceCandidate(candidate) {
   }
 }
 
-// 把setRemote绑定到window上方便测试
-window.addIceCandidate = addIceCandidate;
-
+ipcRenderer.on("offer", (e, offer) => {
+  createAnswer(offer).then(answer => {
+    ipcRenderer.send("forward", "answer", {
+      type: answer.type,
+      sdp: answer.sdp
+    });
+  });
+});
 async function createAnswer(offer) {
   // 调用getScreenStream获取媒体流
   const mediaStream = await getScreenStream();
@@ -71,8 +84,6 @@ async function createAnswer(offer) {
   await pc.setRemoteDescription(offer);
   // 调用setLocalDescription方法保存本地SDP
   await pc.setLocalDescription(await pc.createAnswer());
-  console.log("answer", JSON.stringify(pc.localDescription));
+  // console.log("answer", JSON.stringify(pc.localDescription));
   return pc.localDescription;
 }
-
-window.createAnswer = createAnswer;

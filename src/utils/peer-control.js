@@ -1,6 +1,7 @@
 // node事件模块 监听和触发事件
 const EventEmitter = require("events");
 const peer = new EventEmitter();
+const { ipcRenderer } = require("electron");
 // getScreenStream();
 // peer.on("robot", (type, data) => {
 //   if (type === "mouse") {
@@ -20,8 +21,16 @@ const pc = new window.RTCPeerConnection({});
 // docs: https://developer.mozilla.org/zh-CN/docs/Web/API/RTCPeerConnection/onicecandidate
 // WebRTC中可以通过onicecandidate这个事件去拿到对应的iceEvent
 pc.onicecandidate = function(event) {
-  console.log("candidate", JSON.stringify(event.candidate));
+  if (event.candidate) {
+    // https://www.electronjs.org/docs/api/ipc-renderer#ipcrenderersendchannel-args
+    ipcRenderer.send("forward", "control-candidate", event.candidate.toJSON());
+  }
 };
+
+// 监听主进程传来的candidate channel
+ipcRenderer.on("candidate", (e, candidate) => {
+  addIceCandidate(candidate);
+});
 
 // candidate缓冲池
 let candidates = [];
@@ -41,9 +50,6 @@ async function addIceCandidate(candidate) {
   }
 }
 
-// 把setRemote绑定到window上方便测试
-window.addIceCandidate = addIceCandidate;
-
 // 调用createOffer方法创建一个offer 发起连接
 async function createOffer() {
   // 这里offer就是一个SDP
@@ -54,19 +60,22 @@ async function createOffer() {
   });
   // 调用setLocalDescription方法本地保存SDP
   await pc.setLocalDescription(offer);
-  console.log("offer", JSON.stringify(pc.localDescription));
+  // console.log("offer", JSON.stringify(pc.localDescription));
   return pc.localDescription;
 }
 
-createOffer();
+createOffer().then(offer => {
+  ipcRenderer.send("forward", "offer", { type: offer.type, sdp: offer.sdp });
+});
 
 // 接收傀儡端传来的answer
 async function setRemote(answer) {
   await pc.setRemoteDescription(answer);
 }
-
-// 把setRemote绑定到window上方便测试
-window.setRemote = setRemote;
+ipcRenderer.on("answer", (e, answer) => {
+  console.log({ e, answer });
+  setRemote(answer);
+});
 
 pc.ontrack = ev => {
   console.log({ ev });
