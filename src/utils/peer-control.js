@@ -18,6 +18,21 @@ const { ipcRenderer } = require("electron");
 
 const pc = new window.RTCPeerConnection({});
 
+// 通过datachannel传输指令 具体用法和websocket类似
+const dc = pc.createDataChannel("robotChannel", { reliable: false });
+dc.onopen = () => {
+  // 响应控制端触发的robot事件
+  peer.on("robot", (type, data) => {
+    dc.send(JSON.stringify({ type, data }));
+  });
+};
+dc.onmessage = event => {
+  console.log("received", event);
+};
+dc.onerror = error => {
+  console.error(error);
+};
+
 // docs: https://developer.mozilla.org/zh-CN/docs/Web/API/RTCPeerConnection/onicecandidate
 // WebRTC中可以通过onicecandidate这个事件去拿到对应的iceEvent
 pc.onicecandidate = function(event) {
@@ -73,12 +88,11 @@ async function setRemote(answer) {
   await pc.setRemoteDescription(answer);
 }
 ipcRenderer.on("answer", (e, answer) => {
-  console.log({ e, answer });
   setRemote(answer);
 });
 
+// 添加轨道
 pc.ontrack = ev => {
-  console.log({ ev });
   peer.emit("add-stream", ev.streams[0]);
 };
 

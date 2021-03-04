@@ -32,7 +32,19 @@ async function getScreenStream() {
 }
 
 const pc = new window.RTCPeerConnection({});
-
+pc.ondatachannel = event => {
+  event.channel.onmessage = event => {
+    console.log("received", event.data);
+    const { type, data } = JSON.parse(event.data);
+    if (type === "mouse") {
+      data.screen = {
+        width: window.screen.width,
+        height: window.screen.height
+      };
+    }
+    ipcRenderer.send("robot", type, data);
+  };
+};
 // docs: https://developer.mozilla.org/zh-CN/docs/Web/API/RTCPeerConnection/onicecandidate
 // WebRTC中可以通过onicecandidate这个事件去拿到对应的iceEvent 在RTCPeerConnection创建后会自动发起
 pc.onicecandidate = function(event) {
@@ -84,6 +96,5 @@ async function createAnswer(offer) {
   await pc.setRemoteDescription(offer);
   // 调用setLocalDescription方法保存本地SDP
   await pc.setLocalDescription(await pc.createAnswer());
-  // console.log("answer", JSON.stringify(pc.localDescription));
   return pc.localDescription;
 }

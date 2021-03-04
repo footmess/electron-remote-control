@@ -12,7 +12,6 @@ ws.on("open", () => {
 });
 ws.on("message", function incoming(message) {
   let data = {};
-  console.log({ message });
   try {
     data = JSON.parse(message);
   } catch (error) {

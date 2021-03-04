@@ -5,8 +5,10 @@ const vkey = require("vkey");
  * 处理鼠标事件
  * data {clientX,clientY,screen:{width,height},video:{width,height}}
  */
+// TODO 鼠标位置不对，不同分辨率下
 function handleMouseEvent(data) {
   const { clientX, clientY, video, screen } = data;
+  console.log({ data });
   // 等比例定位鼠标位置
   const x = (clientX * screen.width) / video.width;
   const y = (clientY * screen.height) / video.height;
