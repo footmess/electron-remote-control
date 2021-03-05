@@ -9,6 +9,7 @@ const { createProtocol } = require("vue-cli-plugin-electron-builder/lib");
  * 公共创建窗口的函数
  **/
 let win;
+let willCloseApp = false;
 async function create() {
   // Create the browser window.
   win = new BrowserWindow({
@@ -19,6 +20,19 @@ async function create() {
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: true
     }
+  });
+
+  win.on("close", event => {
+    if (willCloseApp) {
+      win = null;
+    } else {
+      event.preventDefault();
+      win.hide();
+    }
+  });
+
+  win.on("ready-to-show", () => {
+    win.show();
   });
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
@@ -47,4 +61,16 @@ function send(channel, ...args) {
   win.webContents.send(channel, ...args);
 }
 
-module.exports = { create, send };
+function show() {
+  if (win) {
+    if (win.isMinimized()) win.restore();
+    win.show();
+  }
+}
+
+function close() {
+  willCloseApp = true;
+  win.close();
+}
+
+module.exports = { create, send, show, close };
