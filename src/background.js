@@ -54,6 +54,7 @@ if (!appLock) {
   app.on("ready", () => {
     createMainWindow();
     handleIPC();
+    require("./browser/trayAndMenu/index");
     require("./robot.js")();
   });
 }
