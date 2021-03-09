@@ -1,6 +1,8 @@
 <template>
   <div v-if="controlText === ''">
-    <p>你的控制码：{{ localCode }}</p>
+    <p>
+      你的控制码：<span @contextmenu="handleContextMenu">{{ localCode }}</span>
+    </p>
     <input type="text" v-model="remoteCode" />
     <button @click="handleClick(remoteCode)">确认</button>
   </div>
@@ -11,7 +13,6 @@
 // @ is an alias to /src
 import "@/utils/peer-puppet";
 import { ipcRenderer } from "electron";
-
 export default {
   name: "Home",
   data() {
@@ -62,6 +63,14 @@ export default {
      **/
     handleClick(code) {
       ipcRenderer.send("control", code);
+    },
+    /**
+     * 处理右键点击事件
+     * params event
+     **/
+    async handleContextMenu(event) {
+      event.preventDefault();
+      await ipcRenderer.invoke("handle-context-menu");
     }
   }
 };

@@ -38,7 +38,7 @@ async function create() {
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     // http://localhost:8080/ 启动的web服务地址
-    await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL);
+    await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL + "puppet");
     const ret = globalShortcut.register("Control+z", () => {
       win.webContents.openDevTools();
     });

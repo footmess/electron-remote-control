@@ -1,4 +1,4 @@
-const { ipcMain } = require("electron");
+const { ipcMain, Menu, MenuItem } = require("electron");
 const { send: sendMainWindow } = require("./windows/main");
 const {
   create: createControlWindow,
@@ -14,6 +14,16 @@ module.exports = function() {
     // 这里就通过signal来处理业务逻辑
     const { code } = await signal.invoke("login", null, "logined");
     return code;
+  });
+
+  // 处理渲染进程发来的handle-context-menu请求
+  ipcMain.handle("handle-context-menu", () => {
+    const menu = new Menu();
+    const menuItem1 = new MenuItem({ label: "复制", role: "copy" });
+    const menuItem2 = new MenuItem({ label: "分享" });
+    menu.append(menuItem1);
+    menu.append(menuItem2);
+    menu.popup();
   });
 
   // 监听control channel，将signal响应事件写在这儿更加清楚
